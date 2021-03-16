@@ -3,10 +3,8 @@
 #include <sys/wait.h>
 
 int main(void) {
-    system("date");
-    system("hello");
+    system("date"); //sikeres, lefutó parancs
+    system("hello"); //hibás, nem létező parancs
 
     return 0;
 }
-
-
