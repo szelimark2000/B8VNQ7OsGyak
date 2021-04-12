@@ -1,0 +1,5 @@
+3. Írjon C nyelvű programot, ami:
+        - létrehoz két gyermekprocesszt,
+        - ezek a gyermekprocesszek létrehoznak 3-3 további gyermeket
+        - ezek az unokák várakoznak néhany másodpercet és szűnjenek meg
+        - a szülők várják meg a gyermekek befejeződését és csak utána szűnjenek meg.

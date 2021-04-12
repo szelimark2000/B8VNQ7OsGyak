@@ -14,4 +14,4 @@ main(int argc, char **argv)
 	pid = atoi(argv[1]);
 
 	kill(pid, SIGALRM);
-}	
+}
