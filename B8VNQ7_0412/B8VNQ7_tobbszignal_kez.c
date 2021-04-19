@@ -1,60 +1,55 @@
-#include <signal.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <signal.h>
 
-void handleSignal();
+void handleSignals(int sig);
 
-int main(){
+unsigned int interrupts = 0;
 
-    signal(SIGINT, handleSignal);
-    signal(SIGQUIT, handleSignal);
+int main(void){
 
-    for (int i = 0; i < 10; i++){
-        printf("Varakozas...\n");
-        pause();
-    }
+   if(signal(SIGINT, handleSignals) == SIG_ERR)
+   {
+           printf("A HandleSignal-t nem sikerult atallitani a SIGINT jelre!\n");
+           return 0;
+   }
 
-    return 0;
+   if(signal(SIGQUIT, handleSignals) == SIG_ERR)
+   {
+           printf("A HandleSignal-t nem sikerult SIGQUIT jelre atallitani!\n");
+           return 0;
+   }
+
+   while (!interrupts)
+   {
+        printf("Varakozas a signal-ra...\n");
+        sleep(5);
+   }
+
+   printf("Terminalodas...\n");
+
+   return 0;
 }
 
-void handleSignal(int sig){
-char desc[50];
+void handleSignals(int sig){
 
-switch(sig){
-    case 1: {
-        strcpy(desc, "Hangup Signal\n");
-        break;
-	}
+        switch(sig)
+        {
+                case SIGINT: 
+                {
+                        printf("\nSIGINT signal: %d\n", sig);
+                        printf("A kovetkezo SIGINT-re (CTRL+C) leall!\n");
+                        signal(SIGINT, SIG_DFL);
+                        break;
+                }
 
-	case 2: {
-        strcpy(desc, "Interrupt Signal\n");
-        signal(SIGINT, SIG_DFL);
-        printf("\nA 'CTRL + C' parancs ki fogja leptetni a programbol!\n");
-        break;
-	}
-
-	case 3: {
-        strcpy(desc, "Quit Signal\n");
-        break;
-	}
-
-	case 4: {
-        strcpy(desc, "Illegal Instruction Signal\n");
-        break;
-	}
-
-	case 5: {
-        strcpy(desc, "Trace Trap Signal\n");
-        break;
-	}
-
-	case 6: {
-        strcpy(desc, "Abort Signal\n");
-        break;
-	}
-
-        printf("\nAz elkapott jel: %s\n", desc);
+                case SIGQUIT: 
+                {
+                        printf("SIGQUIT signal: %d\n", sig);
+                        interrupts = 1;
+                        break;
+                }
         }
 }
