@@ -17,12 +17,19 @@ int main()
 {   
     int gyermek_pid[2]; // Gyermekprocesszek PID értékeineknek tárolására szolgáló tömb.
     int unoka_pid[6]; // Unokaprocesszek PID értékeineknek tárolására szolgáló tömb.
+    pid_t pid; // pid_t adattípus a proceszek azonosítását jelenti.
+    int alvas = 10; // A várakozásra szolgáló változó, melynek értéke 10.
 
     printf("Szülőprocessz vagyok!\n"); // Szülőprocessz kiíratása.
 
-    for(int i = 0; i < 2; i++) // 2 gyermekprocessz létrehozását szolgáló számláló (for) ciklus.
+        for(int i = 0; i < 2; i++) // 2 gyermekprocessz létrehozását szolgáló számláló (for) ciklus.
     {
-        if(fork() == 0) // A gyermekprocessz létrehozása. Ha a fork() rendszerhívás visszatérési értéke 0, akkor lefut az elágazás.
+        if((pid = fork()) < 0) // Hibaellenőrzés.
+        {
+            perror("Fork ERROR!\n"); // Fork error kiíratása.
+        }
+
+        else if(pid == 0) // A gyermekprocessz létrehozása. Ha a fork() rendszerhívás visszatérési értéke 0, akkor lefut az elágazás.
         {
             gyermek_pid[i] = getpid(); // A tömb i-edik elemének beállítása.
 
@@ -30,11 +37,16 @@ int main()
 
             for(int i = 0; i < 3; i++) // 3-3 unokaprocesszek létrehozására szolgáló számláló (for) ciklus.
             {
-                if(fork() == 0) // Az unokaprocesszek létrehozása. Ha a fork() rendszerhívás visszatérési értéke 0, akkor lefut az elágazás.
+                if((pid = fork()) < 0) // Hibaellenőrzés.
                 {
-                    unoka_pid[i] = getpid();
+                    perror("Fork ERROR!\n"); // Fork error kiíratása.
+                }
+                
+                else if(pid == 0) // Az unokaprocesszek létrehozása. Ha a fork() rendszerhívás visszatérési értéke 0, akkor lefut az elágazás.
+                {
+                    unoka_pid[i] = getpid(); // A tömb i-edik elemének beállítása.
                     printf("Unokaprocessz vagyok! Unokaprocessz PID értékem: %d, Szülőm PID értéke: %d\n", getpid(), getppid()); // Az uokaprocessz, annak PID-je, valamint a szülőjének PID-jének kiíratása.
-                    sleep(10); // Az unokaprocesszek 10 másodperc után megszűnnek.
+                    sleep(alvas); // Az unokaprocesszek 10 másodperc után megszűnnek.
                     printf("Megszűnt unokaprocessz! A megszűnt unokaprocessz PID értéke: %d\n", getpid()); // Az unokaprocessz megszűnésének kiíratása, valamint annak PID-je.
                     exit (0);
                 }
@@ -42,9 +54,7 @@ int main()
 
             wait(NULL); // Unokaprocesszekre való várakozás.
             printf("Megszűnt gyermekprocessz! A megszűnt gyermekprocessz PID értéke: %d\n", getpid()); // A gyermkeporcessz megszűnésének kiíratása, valamint annak PID-je.
-            exit (0);
-
-            
+            exit (0);            
         }      
     }
 
